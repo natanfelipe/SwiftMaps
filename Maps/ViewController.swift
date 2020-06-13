@@ -11,6 +11,9 @@ import MapKit
 
 class ViewController: UIViewController, MKMapViewDelegate {
     
+    let pointerTitle = "Opera House"
+    let pointerSubtitle = "Centro de artes histórico de referência na cidade para ópera, teatro, música e dança, além de tours guiados."
+    
     @IBOutlet weak var map: MKMapView!
     
     override func viewDidLoad() {
@@ -20,6 +23,7 @@ class ViewController: UIViewController, MKMapViewDelegate {
     
     private func initMaps() {
         map.setRegion(getRegion(), animated: true)
+        map.addAnnotation(getPointer())
     }
 
     private func getRegion() -> MKCoordinateRegion {
@@ -35,10 +39,19 @@ class ViewController: UIViewController, MKMapViewDelegate {
     
     //FUNCTION RESPONSABLE FOR DEFINE THE MAP ZOOM
     private func getCoordinateSpan() -> MKCoordinateSpan {
-        let deltaLatitude: CLLocationDegrees = 0.001
-        let deltaLongitude: CLLocationDegrees = 0.001
+        let deltaLatitude: CLLocationDegrees = 0.01
+        let deltaLongitude: CLLocationDegrees = 0.01
         
         return MKCoordinateSpan.init(latitudeDelta: deltaLatitude, longitudeDelta: deltaLongitude)
+    }
+    
+    private func getPointer() -> MKPointAnnotation {
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = getCoordinates()
+        annotation.title = pointerTitle
+        annotation.subtitle = pointerSubtitle
+        
+        return annotation
     }
 
 }
