@@ -9,33 +9,46 @@
 import UIKit
 import MapKit
 
-class ViewController: UIViewController, MKMapViewDelegate {
+class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDelegate {
     
     let pointerTitle = "Opera House"
     let pointerSubtitle = "Centro de artes histórico de referência na cidade para ópera, teatro, música e dança, além de tours guiados."
     
     @IBOutlet weak var map: MKMapView!
+    var locationMananger = CLLocationManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        initMaps()
+        getLocation()
     }
     
-    private func initMaps() {
-        map.setRegion(getRegion(), animated: true)
-        map.addAnnotation(getPointer())
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        initMaps(location: locations.last!)
+    }
+    
+    private func initMaps(location: CLLocation) {
+        map.setRegion(getRegion(location: location), animated: true)
+        //map.addAnnotation(getPointer(location: location))
+    }
+    
+    private func getLocation() {
+        locationMananger.delegate = self
+        locationMananger.desiredAccuracy = kCLLocationAccuracyBest
+        locationMananger.requestWhenInUseAuthorization()
+        locationMananger.startUpdatingLocation()
     }
 
-    private func getRegion() -> MKCoordinateRegion {
-        return MKCoordinateRegion.init(center: getCoordinates(), span: getCoordinateSpan())
+    private func getRegion(location: CLLocation) -> MKCoordinateRegion {
+        return MKCoordinateRegion.init(center: getCoordinates(location: location), span: getCoordinateSpan())
     }
     
-    private func getCoordinates() -> CLLocationCoordinate2D {
-        let latitude = -33.856565
-        let longitude = 151.215279
+    private func getCoordinates(location: CLLocation) -> CLLocationCoordinate2D {
+        let latitude = location.coordinate.latitude
+        let longitude = location.coordinate.longitude
         
         return CLLocationCoordinate2DMake(latitude, longitude)
     }
+    
     
     //FUNCTION RESPONSABLE FOR DEFINE THE MAP ZOOM
     private func getCoordinateSpan() -> MKCoordinateSpan {
@@ -45,9 +58,9 @@ class ViewController: UIViewController, MKMapViewDelegate {
         return MKCoordinateSpan.init(latitudeDelta: deltaLatitude, longitudeDelta: deltaLongitude)
     }
     
-    private func getPointer() -> MKPointAnnotation {
+    private func getPointer(location: CLLocation) -> MKPointAnnotation {
         let annotation = MKPointAnnotation()
-        annotation.coordinate = getCoordinates()
+        annotation.coordinate = getCoordinates(location: location)
         annotation.title = pointerTitle
         annotation.subtitle = pointerSubtitle
         
